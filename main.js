@@ -5,35 +5,41 @@ const person = {
   email: "john.doe@example.com",
 };
 
-Object.defineProperties(person, {
-  firstName: { writable: false, configurable: false },
-  lastName: { writable: false, configurable: false },
-  age: { writable: false, configurable: false },
-  email: { writable: false, configurable: false }
-});
+for (let prop in person) {
+  Object.defineProperty(person, prop, {
+    writable: false,
+  });
+}
+
+// Object.defineProperties(person, {
+//   firstName: { writable: false },
+//   lastName: { writable: false },
+//   age: { writable: false },
+//   email: { writable: false }
+// });
 
 Object.defineProperty(person, 'updateInfo', {
-  value: function(info) {
-    if (info && typeof info === 'object') {
-      for (let key in info) {
-        if (person.hasOwnProperty(key) && Object.getOwnPropertyDescriptor(person, key).writable) {
-          person[key] = info[key];
+  value: function(newInfoObject) {
+    if (newInfoObject && typeof newInfoObject === 'object') {
+      for (let prop in newInfoObject) {
+        if (person.hasOwnProperty(prop)) {
+          const deskriptorValue = Object.getOwnPropertyDescriptor(person, prop).writable;
+          Object.defineProperty(person, prop, {
+            writable: true,
+          });
+          person[prop] = newInfoObject[prop];
+          Object.defineProperty(person, prop, {
+            writable: deskriptorValue,
+          });
         }
       }
     }
-  },
-  writable: false,
-  enumerable: false,
-  configurable: false
-});
-
-Object.defineProperty(person, 'address', {
-  value: {},
-  writable: true,
-  enumerable: false,
-  configurable: false
+  }
 });
 
 person.updateInfo({ firstName: "Jane", age: 32 }); 
 
-console.log(person); 
+Object.defineProperty(person, "address", {
+  value: {},
+  writable: true,
+});
