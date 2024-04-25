@@ -82,3 +82,103 @@ function deleteNonConfigurable (objectToModify, propertyToDelete) {
     throw new Error(`It's impssible to delete nonconfigurable property`);
   }
 }
+
+//Task 3: Object Property Getters and Setters
+let bankAccount = {
+  _balance: 1000, 
+
+  get formattedBalance() {
+      return `$${this._balance}`;
+  },
+
+  set balance(newBalance) {
+      if (typeof newBalance === 'number' && newBalance >= 0) {
+          this._balance = newBalance;
+      } else {
+          throw new Error('Invalid balance');
+      }
+  },
+
+  transfer: function(targetAccount, amount) {
+    if (typeof amount !== 'number' || amount <= 0) {
+        throw new Error('Invalid amount');
+    }
+
+    if (this._balance < amount) {
+        throw new Error('Insufficient funds');
+    }
+
+    this._balance = this._balance - amount;
+    targetAccount._balance = targetAccount._balance + amount;
+  }
+};
+
+let bankAccount1 = {
+  _balance: 1000, 
+
+  get formattedBalance() {
+      return `$${this._balance}`;
+  },
+
+  set balance(newBalance) {
+      if (typeof newBalance === 'number' && newBalance >= 0) {
+          this._balance = newBalance;
+      } else {
+          throw new Error(`Invalid balance ${newBalance}`);
+      }
+  },
+};
+
+//Task 4: Advanced Property Descriptors
+function createImmutableObject(obj) {
+  let immutableObj = {};
+
+  Object.keys(obj).forEach(key => {
+    if (typeof obj[key] === 'object' && obj[key] !== null && !Array.isArray(obj[key])) {
+      immutableObj[key] = createImmutableObject(obj[key]);
+    } else {
+      Object.defineProperty(immutableObj, key, {
+        value: obj[key],
+        writable: false,
+        configurable: false
+      });
+    }
+  });
+  return immutableObj;
+}
+
+//Task 5: Object Observation
+function observeObject(obj, callback) {
+  let observedObj = {};
+
+  function createAccessor(prop) {
+      Object.defineProperty(observedObj, prop, {
+          get() {
+              callback(prop, 'get');
+              return obj[prop];
+          },
+          set(value) {
+              callback(prop, 'set');
+              obj[prop] = value;
+          },
+          enumerable: true,
+          configurable: true
+      });
+  }
+
+  // Create property accessors for each property of the object
+  Object.keys(obj).forEach(prop => {
+      createAccessor(prop);
+  });
+
+  return observedObj;
+}
+
+function callback(prop, action) {
+  console.log(`The property name is: '${prop}'`);
+  console.log(`The action is: ${action}`)
+}
+
+let observedPerson = observeObject(person, callback);
+
+console.log(observedPerson.firstName); 
