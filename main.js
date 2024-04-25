@@ -182,3 +182,24 @@ function callback(prop, action) {
 let observedPerson = observeObject(person, callback);
 
 console.log(observedPerson.firstName); 
+
+//Task 6: Object Deep Cloning
+function deepCloneObject(obj, clonedObjects = {}) {
+  if (obj === null || typeof obj !== 'object') {
+      return obj;
+  }
+
+  if (clonedObjects[obj]) {
+      return clonedObjects[obj];
+  }
+
+  let clonedObj = Array.isArray(obj) ? [] : {};
+
+  clonedObjects[obj] = clonedObj;
+
+  for (let key in obj) {
+      clonedObj[key] = deepCloneObject(obj[key], clonedObjects);
+  }
+
+  return clonedObj;
+}
