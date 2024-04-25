@@ -203,3 +203,23 @@ function deepCloneObject(obj, clonedObjects = {}) {
 
   return clonedObj;
 }
+
+//Task 7: Object Property Validation
+function validateObject(obj, schema) {
+  for (let key in schema) {
+    // does the property exist in the object
+    if (!(key in obj)) { 
+      return false; 
+    }
+    // does the type of the property is valid
+    if (typeof obj[key] !== schema[key].type) {
+      return false; 
+    }
+    // if there is any additional validation
+    if (schema[key].validate && !schema[key].validate(obj[key])) {
+        return false; 
+    }
+  }
+
+  return true; 
+}
