@@ -139,8 +139,8 @@ function createImmutableObject(obj) {
     } else {
       Object.defineProperty(immutableObj, key, {
         value: obj[key],
-        writable: false,
-        configurable: false
+        configurable: true,
+        enumerable: true
       });
     }
   });
